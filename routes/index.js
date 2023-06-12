@@ -6,4 +6,8 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'ToDoApp' });
 });
 
+router.post("/", function (req, res, next) {
+  res.render("index", { title: "ToDoApp" });
+});
+
 module.exports = router;
