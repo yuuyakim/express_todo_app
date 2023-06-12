@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mysql = require("mysql");
 const conn_obj = require("../connection_obj");
+const knex = require('../db/knex')
 
 const connection = mysql.createConnection(
   conn_obj
@@ -9,14 +10,21 @@ const connection = mysql.createConnection(
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  connection.query(`select * from tasks;`, (error, results) => {
-    console.log(error);
-    console.log(results);
-    res.render("index", {
-      title: "ToDo App",
-      todos: results,
-    });
-  });
+  knex("tasks")
+    .select("*")
+    .then( (results) => {
+      console.log(results)
+      res.render('index', {
+        title: 'ToDo App',
+        todos: results
+      })
+    })
+    .catch( (err) => {
+      console.error(err)
+      res.render('index', {
+        title: 'ToDo App'
+      })
+    })
 });
 
 router.post("/", function (req, res, next) {
