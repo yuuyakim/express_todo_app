@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const knex = require("../db/knex");
+const bcrypt = require("bcrypt");
 
 router.get("/", function (req, res, next) {
   const userId = req.session.userid;
@@ -21,7 +22,7 @@ router.post("/", function(req, res, next) {
   knex('users')
     .where({name: username})
     .select('*')
-    .then((result) => {
+    .then(async (result) => {
       if (result.length !== 0) {
         res.render("signup", {
           title: "sign Up",
@@ -29,17 +30,18 @@ router.post("/", function(req, res, next) {
           errorMessage: ["このユーザー名は既に使われています"],
         });
       } else if (password === repassword) {
-        knex('users')
-          .insert({name: username, password: password})
-          .then(() => res.redirect('/'))
+        const hashedPassword = await bcrypt.hash(password, 10);
+        knex("users")
+          .insert({ name: username, password: hashedPassword })
+          .then(() => res.redirect("/"))
           .catch((err) => {
-            console.error(err)
+            console.error(err);
             res.render("signup", {
               title: "sign Up",
               isAuth: isAuth,
               errorMessage: [err.sqlMessage],
             });
-          })
+          });
       } else {
         res.render("signup", {
           title: "signUp",
