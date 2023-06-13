@@ -20,6 +20,7 @@ router.post("/", function (req, res, next) {
     })
     .then((results) => {
       if (results.length !== 0) {
+        req.session.userid = results[0].id
         res.redirect("/");
       } else {
         res.render("signin", {
