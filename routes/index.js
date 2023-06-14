@@ -10,8 +10,7 @@ const connection = mysql.createConnection(
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  const userId = req.session.userid
-  const isAuth = Boolean(userId)
+  const isAuth = req.isAuthenticated()
 
   knex("tasks")
     .select("*")
@@ -32,11 +31,11 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/", function (req, res, next) {
-  const userId = req.session.userid;
-  const isAuth = Boolean(userId);
+  const isAuth = req.isAuthenticated();
+  const userId = req.user.id;
   const todo = req.body.add
   knex("tasks")
-    .insert({user_id: 1, content: todo})
+    .insert({user_id: userId, content: todo})
     .then( () => {
       res.redirect('/')
     })
